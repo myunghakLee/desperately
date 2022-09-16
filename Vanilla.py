@@ -1,6 +1,6 @@
 # +
 import torch
-model = torch.hub.load("pytorch/vision", "vit_b_16")
+model = torch.hub.load("pytorch/vision", "vit_l_16")
 
 import torchvision
 from Models.transformer import VisionTransformer as vit
@@ -14,13 +14,12 @@ import torch.nn as nn
 import utils
 # -
 
-train_loader, test_loader = CIFAR100.get_data(117*3)
+train_loader, test_loader = CIFAR100.get_data(70*3)
 
-# +
 # model = torch.hub.load("pytorch/vision", f'vgg16', pretrained=True)
 # model = vit(model)
-
-model = vit(class_num = 100, pretrained = True, is_vanilla=True)
+layer_num = 16
+model = vit(class_num = 100, pretrained = True, layer = layer_num, model = 'large')
 
 # +
 device = "cuda"
@@ -49,7 +48,7 @@ for epoch in range(100):
     acc = utils.test(model, test_loader, device, epoch)
     test_acc.append(acc.item())
     
-    if acc > best_acc:
+    if acc > best_acc + 0.005:
         best_acc = acc
         stack = 0
     else:
@@ -61,16 +60,13 @@ for epoch in range(100):
         step_epoch.append(epoch)
         print("STEP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         
-torch.save(model, "de.pth")
-# -
+# torch.save(model, "de.pth")
 
 
-model
+# +
+torch.save(model, f"saved_models/vit/vit_l_{layer_num}/vit_l_{layer_num}.pth")
+torch.cuda.empty_cache()
 
-# !rm saved_models/vit_b_teacher_16_86_66.pth
-
-torch.save(model, "saved_models/vit_b_teacher_16_86_66.pth")
-
-test_acc
-
-train_acc
+with open(f"saved_models/vit/vit_l_{layer_num}/vit_l_{layer_num}.json", "w") as f:
+    json.dump({"student_test_accs" : train_acc,
+              "test_acc" : test_acc}, f)

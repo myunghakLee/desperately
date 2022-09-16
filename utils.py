@@ -97,7 +97,7 @@ def to_gaussian_rgb(img, mean, std): # rgb별로 따로 gaussian처리
 
 
 # +
-def get_LRP_img(img, label, model, criterion, optimizer, std = 0.1, mean = 1.0, mult = 500):
+def get_LRP_img(img, label, model, criterion, optimizer, std = 0.1, mean = 1.0, mult = 0.4):
     img.requires_grad = True
     img.retain_grad = True
     

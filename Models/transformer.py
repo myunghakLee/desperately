@@ -18,14 +18,33 @@ def get_params(model):
 
 
 class VisionTransformer(nn.Module):
-    def __init__(self, class_num, model = None, pretrained = None, is_vanilla=False):
+    def __init__(self, class_num, model = None, pretrained = None, is_vanilla=False, layer = 16):
         super(VisionTransformer, self).__init__()
         
         if model == None:
-            if pretrained:
-                model = torchvision.models.vit_l_16(weights='IMAGENET1K_V1')
-            else:
-                model = torchvision.models.vit_l_16()
+            if layer == 16:
+                if pretrained:
+                    model = torchvision.models.vit_b_16(weights='IMAGENET1K_V1')
+                else:
+                    model = torchvision.models.vit_b_16()
+            elif layer == 32:
+                if pretrained:
+                    model = torchvision.models.vit_b_32(weights='IMAGENET1K_V1')
+                else:
+                    model = torchvision.models.vit_b_32()
+        elif model == "large":
+            if layer == 16:
+                if pretrained:
+                    model = torchvision.models.vit_l_16(weights='IMAGENET1K_V1')
+                else:
+                    model = torchvision.models.vit_l_16()
+            elif layer == 32:
+                if pretrained:
+                    model = torchvision.models.vit_l_32(weights='IMAGENET1K_V1')
+                else:
+                    model = torchvision.models.vit_l_32()
+            
+            
             
         self.patch_size = model.patch_size
         self.image_size = model.image_size
@@ -92,7 +111,7 @@ class VisionTransformer(nn.Module):
 
         if layer == 3+len(self.encoder.layers):  # ????????????
             feature_knowledge = x
-
+            
         feature_knowledge.retain_grad = True
 
         x = x[:, 0]
