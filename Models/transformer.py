@@ -17,16 +17,15 @@ def get_params(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-# +
 class VisionTransformer(nn.Module):
     def __init__(self, class_num, model = None, pretrained = None, is_vanilla=False):
         super(VisionTransformer, self).__init__()
         
         if model == None:
             if pretrained:
-                model = torchvision.models.vit_b_16(weights='ViT_B_16_Weights.DEFAULT')
+                model = torchvision.models.vit_l_16(weights='IMAGENET1K_V1')
             else:
-                model = torchvision.models.vit_b_16()
+                model = torchvision.models.vit_l_16()
             
         self.patch_size = model.patch_size
         self.image_size = model.image_size
@@ -91,9 +90,10 @@ class VisionTransformer(nn.Module):
             feature_knowledge = x
 
 
-#         if layer == 3+len(self.encoder.layers):  # ????????????
-#             feature_knowledge = x
-#             feature_knowledge.retain_grad = True
+        if layer == 3+len(self.encoder.layers):  # ????????????
+            feature_knowledge = x
+
+        feature_knowledge.retain_grad = True
 
         x = x[:, 0]
 
@@ -101,8 +101,6 @@ class VisionTransformer(nn.Module):
         
         return x if self.is_vanilla else x, feature_knowledge
 
-
-# -
 
 def swin(class_num, name, bn = True, checkpoint = None, pretrained = False):
     assert depth in ["b", "s", "t"], "Depth must be select in [18, 34, 50, 101, 152]"
