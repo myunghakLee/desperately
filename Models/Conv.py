@@ -91,6 +91,58 @@ def resnet(class_num, depth, bn = True, checkpoint = None, pretrained = False, w
     return model
 
 
+class vgg_feature(nn.Module):
+    def __init__(self, class_num, depth, model = None, pretrained = None, is_vanilla=False):
+        super(vgg_feature, self).__init__()
+        if model == None:
+            if pretrained:
+                self.model = torch.hub.load("pytorch/vision", f'vgg{depth}_bn', weights=pretrained)
+            else:
+                self.model = torch.hub.load("pytorch/vision", f'vgg{depth}_bn')
+        
+        else:
+            self.model = copy.deepcopy(model)
+        
+        
+        if self.model.classifier[-1].out_features != class_num:
+            self.model.classifier[-1] = nn.Linear(self.model.classifier[-1].in_features, class_num)
+        
+        self.bn_pos = {
+            11 : [1, 5, 9, 12, 16, 19, 23, 26],
+            13 : [1, 4, 8, 11, 15, 18, 22, 25, 29, 32],
+            16 : [1, 4, 8, 11, 15, 18, 21, 25, 28, 31, 35, 38, 41],
+            19 : [1, 4, 8, 11, 15, 18, 21, 24, 28, 31, 34, 37, 41, 44, 47, 50]
+        }
+        
+        self.length = len(self.bn_pos[depth]) # model내 bn의 개수, 즉 feature knowledge의 개수
+        self.depth = depth
+        
+        del model
+
+    def forward(self, x, layer = 0):
+        
+        layer_count = 0
+        
+        for i, feature in enumerate(self.model.features):
+            x = feature(x)
+            if i in self.bn_pos[self.depth]:
+                if layer_count == layer:
+                    h = x.clone()
+                layer_count += 1
+        
+        x = self.model.avgpool(x)
+        x= torch.flatten(x,1)
+        
+        for j, features in enumerate(self.model.classifier):
+            x = features(x)
+            if j % 3 == 2:
+                if layer_count == layer:
+                    h = x.clone()
+                layer_count += 1
+        
+        return x, h
+
+
 class resnet_feature(nn.Module):
     def __init__(self, class_num, depth, model = None, pretrained = None, is_vanilla=False):
         super(resnet_feature, self).__init__()
