@@ -114,7 +114,7 @@ class vgg_feature(nn.Module):
             19 : [1, 4, 8, 11, 15, 18, 21, 24, 28, 31, 34, 37, 41, 44, 47, 50]
         }
         
-        self.length = len(self.bn_pos[depth]) # model내 bn의 개수, 즉 feature knowledge의 개수
+        self.length = len(self.bn_pos[depth]) + 1 # model내 bn의 개수, 즉 feature knowledge의 개수
         self.depth = depth
         
         del model
@@ -164,6 +164,9 @@ class resnet_feature(nn.Module):
             self.model.relu,
             self.model.maxpool
         )
+
+        self.length = 4 # model내 bn의 개수, 즉 feature knowledge의 개수
+        self.depth = depth
         
         del model
 

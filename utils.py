@@ -1,12 +1,23 @@
 # -*- coding: utf-8 -*-
 from tqdm import tqdm
-import torch
+import numpy as np
+
 
 import torchvision.transforms as transforms
 import torch.nn as nn
 import torchvision
 import torch
 import copy
+
+
+def set_seed(seed = 0):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    cudnn.benchmark = False
+    cudnn.deterministic = True
+    random.seed(seed)
 
 
 def get_LRP_img(img, label, model, criterion, optimizer, std = 0.1, mean = 1.0):
@@ -96,7 +107,6 @@ def to_gaussian_rgb(img, mean, std): # rgb별로 따로 gaussian처리
     return img
 
 
-# +
 def get_LRP_img(img, label, model, criterion, optimizer, std = 0.1, mean = 1.0, mult = 0.4):
     img.requires_grad = True
     img.retain_grad = True

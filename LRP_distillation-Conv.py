@@ -110,8 +110,6 @@ utils.test(student, test_loader,device)
 
 
 # %%
-
-
 student_test_accs = []
 layer_num = 4
 
@@ -175,14 +173,6 @@ for epoch in range(100):
 
     test_acc = utils.test(student, test_loader,device, epoch) # student도 변하는거 확인 완료함
     
-#     if test_acc > best_acc + 0.01:
-#         stack = 0
-#         best_acc = test_acc
-        
-#     else:
-#         stack+=1
-    
-#     if stack > 3:  
     S_scheduler.step()
     stack = 0
         
@@ -191,32 +181,11 @@ for epoch in range(100):
 
 
 # %%
-# a = torch.zeros((4,5,6,7))
-# nn.AvgPool2d(5)(a).shape
-
-
-# %%
-
-
-# torch.mean(a, dim=1).shape
-
-
-# %%
-
-
-# distill loss를 2배 키워보는것도 좋을지도
-
-
-# %%
-
-
 utils.test(teacher, test_loader,device, epoch) # student도 변하는거 확인 완료함
 utils.test(student, test_loader,device, epoch) # student도 변하는거 확인 완료함
 
 
 # %%
-
-
 torch.save(student, "saved_models/resnet/resnet{depth}_student.pth")
 
 
@@ -224,60 +193,6 @@ torch.save(student, "saved_models/resnet/resnet{depth}_student.pth")
 
 
 import json
-
 with open(f"saved_models/resnet/resnet{depth}.json", "w") as f:
     json.dump({"student_test_accs" : student_test_accs}, f)
-
-
-# %%
-
-
-# from Models import Conv
-
-# depth = 101
-
-# model = torch.load(f"saved_models/vgg/vgg{depth}.pth").module
-# teacher = Conv.resnet_feature(100, depth, model)
-# student = Conv.resnet_feature(100, depth, pretrained="IMAGENET1K_V1")
-
-
-# device = "cuda"
-
-# teacher = teacher.to(device)
-# teacher = torch.nn.DataParallel(teacher, device_ids=[0, 1])
-
-# student = student.to(device)
-# student = torch.nn.DataParallel(student, device_ids=[0, 1])
-
-# criterion_onlylabel = lambda a,b : mse(a*b, b)
-# criterion_CE = nn.CrossEntropyLoss()
-# mse = nn.MSELoss()
-# softmax = torch.nn.Softmax(dim = 1)
-# criterion_KLD = torch.nn.KLDivLoss(reduction="batchmean")
-# criterion_response = lambda a,b : criterion_KLD(torch.log_softmax(a, dim=1),torch.softmax(b, dim=1))
-
-# S_optimizer = optim.SGD(student.parameters(), lr=0.05, momentum=0.9)
-# T_optimizer = optim.SGD(teacher.parameters(), lr=0.05, momentum=0.9)
-# CE_loss = nn.CrossEntropyLoss()
-
-# S_scheduler = torch.optim.lr_scheduler.MultiStepLR(S_optimizer, milestones=[1,2,3,4,5,6,7], gamma=0.1)
-# T_scheduler = torch.optim.lr_scheduler.MultiStepLR(T_optimizer, milestones=[1,2,3,4,5,6,7], gamma=0.1)
-
-
-
-# torch.manual_seed(0)
-# torch.cuda.manual_seed(0)
-# torch.cuda.manual_seed_all(0)
-# np.random.seed(0)
-# cudnn.benchmark = False
-# cudnn.deterministic = True
-# random.seed(0)
-# best_acc = 0.0
-# stack = 0
-
-# accs_train = []
-# accs_test = []
-
-# utils.test(teacher, test_loader,device)
-# utils.test(student, test_loader,device)
 

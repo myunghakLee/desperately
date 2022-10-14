@@ -60,7 +60,6 @@ for epoch in range(100):
         step_epoch.append(epoch)
         print("STEP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         
-# torch.save(model, "de.pth")
 
 
 # +
