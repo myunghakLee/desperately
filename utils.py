@@ -77,7 +77,7 @@ def train_vanilla(model, data, optimizer, criterion, device, epoch = 0):
 def test(model, data, device, epoch = 0):
     all_data, correct = 0, 0
     model = model.eval()
-    for img, label in tqdm(data):
+    for img, label in data:
         with torch.no_grad():
             img = img.to(device)
             label = label.to(device)
