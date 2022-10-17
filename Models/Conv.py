@@ -62,7 +62,6 @@ def vgg_bn(class_num, depth, bn = True, checkpoint = None, pretrained = False, w
     return model
 
 
-# +
 def resnet(class_num, depth, bn = True, checkpoint = None, pretrained = False, weights = None):
     assert depth in [18, 34, 50, 101, 152], "Depth must be select in [18, 34, 50, 101, 152]"
     
@@ -84,10 +83,8 @@ def resnet(class_num, depth, bn = True, checkpoint = None, pretrained = False, w
             assert get_params(model) == pram_num[depth], "Model depth is wrong"
             model.fc = nn.Linear(model.fc.in_features, class_num)
     
-f    return model
+    return model
 
-
-# -
 
 class vgg_feature(nn.Module):
     def __init__(self, class_num, depth, model = None, pretrained = None, is_vanilla=False):
