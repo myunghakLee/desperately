@@ -3,12 +3,18 @@ from tqdm import tqdm
 import numpy as np
 
 
+# +
 import torchvision.transforms as transforms
 import torch.nn as nn
 import torchvision
 import torch
 import copy
 
+import torch.backends.cudnn as cudnn
+import random
+
+
+# -
 
 def set_seed(seed = 0):
     torch.manual_seed(seed)
@@ -20,27 +26,28 @@ def set_seed(seed = 0):
     random.seed(seed)
 
 
-def get_LRP_img(img, label, model, criterion, optimizer, std = 0.1, mean = 1.0):
-    img.requires_grad = True
-    img.retain_grad = True
+# +
+# def get_LRP_img(img, label, model, criterion, optimizer, std = 0.1, mean = 1.0):
+#     img.requires_grad = True
+#     img.retain_grad = True
     
-    output, _ = model(img)
+#     output, _ = model(img)
 
-    loss = criterion(output, label)
-    loss.backward()
-    optimizer.zero_grad()
+#     loss = criterion(output, label)
+#     loss.backward()
+#     optimizer.zero_grad()
 
-    with torch.no_grad():
+#     with torch.no_grad():
 
-        img_lrp = (img*img.grad).clone()
-        img_lrp = f2(img_lrp)
+#         img_lrp = (img*img.grad).clone()
+#         img_lrp = f2(img_lrp)
 
-        for i in range(len(img_lrp)):
-            img_lrp[i] = to_gaussian(img_lrp[i], std = std, mean = mean)
+#         for i in range(len(img_lrp)):
+#             img_lrp[i] = to_gaussian(img_lrp[i], std = std, mean = mean)
 
-        img_lrp = img*img_lrp # img_lrp가 음수값인것 지움
-    return img_lrp
-
+#         img_lrp = img*img_lrp # img_lrp가 음수값인것 지움
+#     return img_lrp
+# -
 
 def train_vanilla(model, data, optimizer, criterion, device, epoch = 0):
     all_data, correct = 0, 0
@@ -111,7 +118,9 @@ def get_LRP_img(img, label, model, criterion, optimizer, std = 0.1, mean = 1.0, 
     img.requires_grad = True
     img.retain_grad = True
     
-    output, _ = model(img)
+    output = model(img)
+    if isinstance(output,tuple):
+        output = output[0]
 
     loss = criterion(output, label)
     loss.backward()
@@ -149,3 +158,32 @@ def get_LRP_img(img, label, model, criterion, optimizer, std = 0.1, mean = 1.0, 
 
 #         img_lrp = img*img_lrp # img_lrp가 음수값인것 지움
     return output_image
+
+
+# +
+def get_LRP_img_plus(img, label, model, criterion, optimizer, mult = 0.4):
+    img.requires_grad = True
+    img.retain_grad = True
+    
+    output = model(img)
+    if isinstance(output,tuple):
+        output = output[0]
+
+    loss = criterion(output, label)
+    loss.backward()
+    optimizer.zero_grad()
+
+    with torch.no_grad():
+        gradient = img.grad
+#         gradient = (img*img.grad).clone()
+#         gradient = f2(gradient, mult)
+#         img.grad *= 50
+#         img.grad += 1
+        
+#         for i in range(len(gradient)):
+#             gradient[i] = to_gaussian(gradient[i], mean = 0.0, std = std)
+
+#         for i, (m, s) in enumerate(zip(mean,std)):
+#             gradient[i] = to_gaussian_rgb(gradient[i], mean = m, std = s)
+
+    return img + gradient * mult
