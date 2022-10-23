@@ -20,7 +20,7 @@ def get_data(batch_size, num_workers=4, resize=256, test_resize = 256, crop=224,
             #transforms.ToPILImage(),
             transforms.RandomCrop(32, padding=4),
             transforms.RandomHorizontalFlip(),
-            transforms.RandomRotation(5),
+            transforms.RandomRotation(15),
             transforms.ToTensor(),
             normalize
         ])        
